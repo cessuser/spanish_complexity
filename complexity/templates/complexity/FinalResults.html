@@ -1,0 +1,45 @@
+{% extends "global/PageExt.html" %}
+{% load staticfiles otree %}
+
+{% block title %}
+    Final results
+
+{% endblock %}
+
+{% block inner_content %}
+   
+
+
+
+    <div class="card mb-3 ">
+        <div class="card-header">
+
+            <div class="card-body">
+
+                <div class="mb-3">
+                    <div>
+                        You have played {{ Constants.num_periods }} rounds in Modules 1 and 2.
+                    </div>
+
+                    <div>
+                        Two of these {{ Constants.num_periods }} rounds have been randomly selected in order to
+                        determine your earnings.
+
+                    </div>
+                    <div>
+                        Rounds {{ chosen_round1 }}, and {{ chosen_round2 }}
+                        were chosen — Your earnings for these rounds were {{ first_pay }}, and {{ second_pay }}.
+                    </div>
+                    <div>
+                        Your total
+                        earnings in the session so far are {{ first_pay }} + {{ second_pay }}
+                        = {{ participant.payoff }}.
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
