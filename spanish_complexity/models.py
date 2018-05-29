@@ -73,8 +73,8 @@ class Constants(BaseConstants):
 class Subsession(BaseSubsession):
 
     def creating_session(self):
-        self.do_shuffle()
         if self.round_number == 1:
+            self.do_shuffle()
             for p in self.session.get_participants():
                 pround1 = random.randint(1, Constants.num_first_part)
                 pround2 = random.randint(Constants.num_first_part + 1, Constants.num_rounds)
@@ -92,7 +92,7 @@ class Subsession(BaseSubsession):
             self.group_randomly()
             Matrix.append(self.get_group_matrix())
         else:
-            while repeatFlag < 3 or not stopRandom:
+            while repeatFlag < 3 and not stopRandom:
                 self.group_randomly()
                 tempGroup = self.get_group_matrix()
                 ThreeMatrix.append({
@@ -102,20 +102,23 @@ class Subsession(BaseSubsession):
                 for tempMatrixIdx in range(len(Matrix)):
                     for teamIdx in range(len(Matrix[tempMatrixIdx])):
                         for tempTeamIdx in range(len(tempGroup)):
-                            if len([val for val in tempGroup[tempTeamIdx] if val in Matrix[tempMatrixIdx][teamIdx]]) == 2:
-                                ThreeMatrix[repeatFlag].repeat += 1
-                            if (tempTeamIdx == len(Matrix) and
-                                teamIdx == len(Matrix[tempTeamIdx]) and
-                                tempTeamIdx == len(tempGroup) and
-                                ThreeMatrix[repeatFlag].repeat == 0):
-                                stopRandom = True
+                            if len([val for val in tempGroup[tempTeamIdx]
+                                    if val in Matrix[tempMatrixIdx][teamIdx]]) == 2:
+                                ThreeMatrix[repeatFlag]['repeat'] += 1
+                if ThreeMatrix[repeatFlag]['repeat'] == 0:
+                    stopRandom = True
+                    Matrix.append(ThreeMatrix[repeatFlag]['matrix'])
+                repeatFlag += 1
             if not stopRandom:
-                min = len(Matrix[0])
-                for matrixIdx in range(len(Matrix)):
-                    if (Matrix[matrixIdx].repeat < min):
-                        min = matrixIdx
-                self.set_group_matrix(Matrix[min].matrix)
-        print(Matrix)
+                minval = len(Matrix[0])
+                for matrixIdx in range(len(ThreeMatrix)):
+                    if ThreeMatrix[matrixIdx]['repeat'] < minval:
+                        minval = matrixIdx
+                Matrix.append(ThreeMatrix[minval].matrix)
+                self.set_group_matrix(ThreeMatrix[minval].matrix)
+        for eachRound in range(len(Matrix)):
+            print('The Round %d' % (eachRound+1), 'Matrix is')
+            print(Matrix[eachRound], '\n')
 
 
 

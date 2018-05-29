@@ -252,20 +252,20 @@ class Quiz(CustomPage):
 
 page_sequence = [
     SwitchRoles,
-    Intro,
-    Intro2,
-    P1Instructions,
-    # P1Example,
-     P2Instructions,
-    # # P2Example,
-    Quiz,
-    P2FirstDecision,
-    WaitPage,
-    P1Decision,
-
-    P2SecondDecision,
-    BeforeOutcomeWP,
-    Outcome,
-    FinalResults,
+    # Intro,
+    # Intro2,
+    # P1Instructions,
+    # # P1Example,
+    #  P2Instructions,
+    # # # P2Example,
+    # Quiz,
+    # P2FirstDecision,
+    # WaitPage,
+    # P1Decision,
+    #
+    # P2SecondDecision,
+    # BeforeOutcomeWP,
+    # Outcome,
+    # FinalResults,
     ShuffleWaitPage
 ]
