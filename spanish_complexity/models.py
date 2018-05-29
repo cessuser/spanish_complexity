@@ -11,10 +11,11 @@ author = 'Philipp Chapkovski'
 doc = """
 R.Duch, D. Landa project on die_game
 """
-
-strangeMatching = [[]]
-FixedOrder = []
-OrderMtx = [[]]
+Matrix = []
+ThreeMatrix = []
+repeatFlag = 0
+bestFlag = 0
+stopRandom = False
 
 def get_practice_rounds(num_practice, num_first_part):
     first_set = list(range(1, num_practice + 1))
@@ -74,24 +75,49 @@ class Subsession(BaseSubsession):
     def creating_session(self):
         self.do_shuffle()
         if self.round_number == 1:
-            #self.do_shuffle()
-            num_players = len(self.get_players())
-            global OrderMtx
-            OrderMtx = [[0 for i in range(num_players)] for j in range(num_players)]
-            print(OrderMtx)
-            self.do_shuffle()
-            #print(self.get_group_matrix())
-            ################################
             for p in self.session.get_participants():
                 pround1 = random.randint(1, Constants.num_first_part)
                 pround2 = random.randint(Constants.num_first_part + 1, Constants.num_rounds)
                 p.vars['paying_rounds'] = [pround1, pround2]
                 #print('Subsession pround1: ',pround1, 'pround2: ',pround2)
-        else:
-            self.do_shuffle()
 
     def do_shuffle(self):
-        self.group_randomly()
+
+        repeatFlag = 0
+        bestFlag = 0
+        ThreeMatrix = []
+        stopRandom = False
+
+        if self.round_number == 1:
+            self.group_randomly()
+            Matrix.append(self.get_group_matrix())
+        else:
+            while repeatFlag < 3 or not stopRandom:
+                self.group_randomly()
+                tempGroup = self.get_group_matrix()
+                ThreeMatrix.append({
+                    'matrix': tempGroup,
+                    'repeat': 0
+                })
+                for tempMatrixIdx in range(len(Matrix)):
+                    for teamIdx in range(len(Matrix[tempMatrixIdx])):
+                        for tempTeamIdx in range(len(tempGroup)):
+                            if len([val for val in tempGroup[tempTeamIdx] if val in Matrix[tempMatrixIdx][teamIdx]]) == 2:
+                                ThreeMatrix[repeatFlag].repeat += 1
+                            if (tempTeamIdx == len(Matrix) and
+                                teamIdx == len(Matrix[tempTeamIdx]) and
+                                tempTeamIdx == len(tempGroup) and
+                                ThreeMatrix[repeatFlag].repeat == 0):
+                                stopRandom = True
+            if not stopRandom:
+                min = len(Matrix[0])
+                for matrixIdx in range(len(Matrix)):
+                    if (Matrix[matrixIdx].repeat < min):
+                        min = matrixIdx
+                self.set_group_matrix(Matrix[min].matrix)
+        print(Matrix)
+
+
 
 LOTTERYOUTCOMES = ((True, 'Éxito'), (False, 'Fracaso'),)
 

@@ -16,18 +16,6 @@ SESSION_CONFIG_DEFAULTS = {
 
 SESSION_CONFIGS = [
     {
-        'name': 'spanish_die_game',
-        'display_name': "Die Game",
-        'num_demo_participants': 2,
-        'app_sequence': ['spanish_die_game'],
-    },
-    {
-        'name': 'spanish_risk_pref',
-        'display_name': "Risk Pref",
-        'num_demo_participants': 2,
-        'app_sequence': ['spanish_risk_pref'],
-    },
-    {
         'name': 'spanish_complexity',
         'display_name': "New Complexity Game",
         'num_demo_participants': 2,
