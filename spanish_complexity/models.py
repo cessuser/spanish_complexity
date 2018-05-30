@@ -4,18 +4,23 @@ from otree.api import (
 )
 from .fields import LotteryField
 import random
+import numpy as np
 import math
+from .perfect_matching import PerfectMatch as pm
 
-author = 'Philipp Chapkovski'
+author = 'Philipp Chapkovski, Danlin Chen'
 
 doc = """
 R.Duch, D. Landa project on die_game
 """
-Matrix = []
-ThreeMatrix = []
-repeatFlag = 0
-bestFlag = 0
-stopRandom = False
+# Matrix = []
+# ThreeMatrix = []
+# repeatFlag = 0
+# bestFlag = 0
+# stopRandom = False
+
+
+
 
 def get_practice_rounds(num_practice, num_first_part):
     first_set = list(range(1, num_practice + 1))
@@ -30,11 +35,19 @@ def get_last_n_rounds(n, num_first_part, num_rounds):
 
 
 class Constants(BaseConstants):
+
     name_in_url = 'spanish_complexity'
     players_per_group = 2
     assert players_per_group == 2, 'Number of players should be 2 for correct role assignemnt'
     num_rounds = 16
     num_first_part = 8
+    num_participants = 10
+    ####perfect matching####
+    cons1 = np.zeros([num_first_part, num_participants], dtype=int)
+    var = np.full([num_first_part, math.floor(num_participants/2) ], -1)
+    Domain = np.zeros([num_participants, num_participants], dtype=int)
+    Assignment = np.zeros([num_first_part, math.floor(num_participants/2), 2], dtype=int)
+    ########################
     num_second_part = num_rounds - num_first_part
     # how many practice rounds we have
     num_practice = 0
@@ -72,53 +85,29 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
 
+    def set_mtx(self):
+        if self.round_number <= 8:
+            round_mtx = []
+            players = self.get_players()
+            for pair in range(0, math.floor(Constants.num_participants / 2)):
+                p1 = Constants.Assignment[self.round_number - 1, pair, 0]
+                p2 = Constants.Assignment[self.round_number - 1, pair, 1]
+                round_mtx.append([players[p1], players[p2]])
+            self.set_group_matrix(round_mtx)
+            print("round: ", self.round_number, "group matrix: ", self.get_group_matrix())
+
     def creating_session(self):
         if self.round_number == 1:
-            self.do_shuffle()
+            PM = pm(Constants.Assignment,Constants.Domain, Constants.var, Constants.cons1, Constants.num_participants, Constants.num_first_part)
+            result = pm.do_shuffle(PM)
+            print(Constants.Assignment)
+            self.set_mtx()
             for p in self.session.get_participants():
                 pround1 = random.randint(1, Constants.num_first_part)
                 pround2 = random.randint(Constants.num_first_part + 1, Constants.num_rounds)
                 p.vars['paying_rounds'] = [pround1, pround2]
                 #print('Subsession pround1: ',pround1, 'pround2: ',pround2)
 
-    def do_shuffle(self):
-
-        repeatFlag = 0
-        bestFlag = 0
-        ThreeMatrix = []
-        stopRandom = False
-
-        if self.round_number == 1:
-            self.group_randomly()
-            Matrix.append(self.get_group_matrix())
-        else:
-            while repeatFlag < 3 and not stopRandom:
-                self.group_randomly()
-                tempGroup = self.get_group_matrix()
-                ThreeMatrix.append({
-                    'matrix': tempGroup,
-                    'repeat': 0
-                })
-                for tempMatrixIdx in range(len(Matrix)):
-                    for teamIdx in range(len(Matrix[tempMatrixIdx])):
-                        for tempTeamIdx in range(len(tempGroup)):
-                            if len([val for val in tempGroup[tempTeamIdx]
-                                    if val in Matrix[tempMatrixIdx][teamIdx]]) == 2:
-                                ThreeMatrix[repeatFlag]['repeat'] += 1
-                if ThreeMatrix[repeatFlag]['repeat'] == 0:
-                    stopRandom = True
-                    Matrix.append(ThreeMatrix[repeatFlag]['matrix'])
-                repeatFlag += 1
-            if not stopRandom:
-                minval = len(Matrix[0])
-                for matrixIdx in range(len(ThreeMatrix)):
-                    if ThreeMatrix[matrixIdx]['repeat'] < minval:
-                        minval = matrixIdx
-                Matrix.append(ThreeMatrix[minval].matrix)
-                self.set_group_matrix(ThreeMatrix[minval].matrix)
-        for eachRound in range(len(Matrix)):
-            print('The Round %d' % (eachRound+1), 'Matrix is')
-            print(Matrix[eachRound], '\n')
 
 
 

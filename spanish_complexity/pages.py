@@ -114,7 +114,8 @@ class Outcome(CustomPage):
 class ShuffleWaitPage(WaitPage):
     wait_for_all_groups = True
     def after_all_players_arrive(self):
-        self.subsession.do_shuffle()
+        self.subsession.set_mtx()
+
 
 
 class FinalResults(CustomPage):
@@ -252,20 +253,20 @@ class Quiz(CustomPage):
 
 page_sequence = [
     SwitchRoles,
-    # Intro,
-    # Intro2,
-    # P1Instructions,
-    # # P1Example,
-    #  P2Instructions,
-    # # # P2Example,
-    # Quiz,
-    # P2FirstDecision,
-    # WaitPage,
-    # P1Decision,
-    #
-    # P2SecondDecision,
-    # BeforeOutcomeWP,
-    # Outcome,
-    # FinalResults,
+    Intro,
+    Intro2,
+    P1Instructions,
+    # P1Example,
+     P2Instructions,
+    # # P2Example,
+    Quiz,
+    P2FirstDecision,
+    WaitPage,
+    P1Decision,
+
+    P2SecondDecision,
+    BeforeOutcomeWP,
+    Outcome,
+    FinalResults,
     ShuffleWaitPage
 ]
