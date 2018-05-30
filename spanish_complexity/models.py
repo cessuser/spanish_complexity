@@ -92,7 +92,7 @@ class Subsession(BaseSubsession):
             self.group_randomly()
             Matrix.append(self.get_group_matrix())
         else:
-            while repeatFlag < 3 and not stopRandom:
+            while repeatFlag < 10000 and not stopRandom:
                 self.group_randomly()
                 tempGroup = self.get_group_matrix()
                 ThreeMatrix.append({
@@ -116,9 +116,26 @@ class Subsession(BaseSubsession):
                         minval = matrixIdx
                 Matrix.append(ThreeMatrix[minval].matrix)
                 self.set_group_matrix(ThreeMatrix[minval].matrix)
-        for eachRound in range(len(Matrix)):
-            print('The Round %d' % (eachRound+1), 'Matrix is')
-            print(Matrix[eachRound], '\n')
+        # for eachRound in range(len(Matrix)):
+        #     print('The Round %d' % (eachRound+1), 'Matrix is')
+        #     print(Matrix[eachRound], '\n')
+        if self.round_number == 8 or self.round_number == 16:
+            PlayerMatrix = [[0]*10 for i in range(10)]  # 10*10 matrix
+            PlayersArray_ = self.get_players()
+            PlayersArray = []
+            for eachPlayer in PlayersArray_:
+                PlayersArray.append(str(eachPlayer.participant_id))
+            print(PlayersArray)
+            for eachRound in Matrix:
+                for eachTeam in eachRound:
+                    team = []
+                    for pIdx in range(len(PlayersArray)):
+                        if str(PlayersArray[pIdx]) == str(eachTeam[0].participant_id) or str(PlayersArray[pIdx]) == str(eachTeam[1].participant_id):
+                            team.append(pIdx)
+                    list.sort(team)
+                    PlayerMatrix[team[0]][team[1]] += 1
+            for row in PlayerMatrix:
+                print(row)
 
 
 
